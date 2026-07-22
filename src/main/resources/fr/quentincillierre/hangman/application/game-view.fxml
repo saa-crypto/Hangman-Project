@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="rootPane" alignment="CENTER" prefHeight="800" prefWidth="800" spacing="15" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.quentincillierre.hangman.controller.GameController">
+
+    <!-- Top Header / Stats Bar -->
+    <HBox alignment="CENTER" spacing="15" style="-fx-background-color: rgba(30, 30, 46, 0.75); -fx-background-radius: 12; -fx-padding: 10 20;">
+        <Label fx:id="streakLabel" style="-fx-text-fill: white; -fx-font-weight: bold;" text="🔥 Streak: 0" />
+        <Label fx:id="scoreLabel" style="-fx-text-fill: white; -fx-font-weight: bold;" text="🏆 Score: 0" />
+        <Label fx:id="timerLabel" style="-fx-text-fill: #f9e2af; -fx-font-weight: bold;" text="⏱️ 60s" />
+        <ComboBox fx:id="difficultyComboBox" />
+    </HBox>
+
+    <!-- Category Label -->
+    <Label fx:id="categoryLabel" style="-fx-text-fill: #cba6f7; -fx-font-size: 16px; -fx-font-weight: bold;" text="Category: " />
+
+    <!-- Game Status Display -->
+    <Label fx:id="resultLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    
+    <!-- Action Control Buttons -->
+    <HBox alignment="CENTER" prefHeight="265.0" prefWidth="760.0" spacing="10">
+        <Button fx:id="startButton" onAction="#onStartClicked" style="-fx-background-color: #a6e3a1; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;" text="▶ Start Round" />
+        <Button fx:id="restartButton" onAction="#onRestartClicked" style="-fx-background-color: #89b4fa; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;" text="Play Again" />
+    </HBox>
+   <HBox prefHeight="100.0" prefWidth="200.0">
+      <children>
+      
+                                                                               <!-- Hangman Image -->
+          <ImageView fx:id="hangmanImageView" fitHeight="234.0" fitWidth="250.0" preserveRatio="true" />
+      </children>
+   </HBox>
+
+                         <!-- Lives Box (Hearts) -->
+    <HBox fx:id="livesBox" alignment="CENTER" spacing="5" />
+
+          <!-- Hidden Word -->
+    <Label fx:id="wordLabel" style="-fx-font-size: 32px; -fx-text-fill: white; -fx-font-weight: bold; -fx-letter-spacing: 5px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);" />
+
+    <!-- Keyboard & Actions -->
+    <GridPane fx:id="keyboardGrid" alignment="CENTER" hgap="5" vgap="5" />
+    
+    <Button fx:id="hintButton" onAction="#onHintClicked" style="-fx-background-color: #f9e2af; -fx-cursor: hand;" text="💡 Hint (-1 Life)" />
+
+</VBox>
