@@ -29,7 +29,7 @@ import javafx.scene.layout.BackgroundSize;
 public class GameController {
 
     // --- Main Layout Container (For Background Image) ---
-    @FXML private Pane rootPane;
+   
 
     // --- Header & Stats Controls ---
     @FXML private Label streakLabel;
