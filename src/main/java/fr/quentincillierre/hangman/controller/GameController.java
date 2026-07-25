@@ -5,6 +5,7 @@ import fr.quentincillierre.hangman.model.HangmanModel;
 import fr.quentincillierre.hangman.model.WordRepository;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -27,7 +28,7 @@ import javafx.util.Duration;
 
 public class GameController {
 
-    // --- Main Layout Container (For Background Image) ---
+    // --- Main Layout Container ---
     @FXML private Pane rootPane;
 
     // --- Header & Stats Controls ---
@@ -50,7 +51,7 @@ public class GameController {
     @FXML private Button restartButton;
 
     // --- Game Logic & Persistence ---
-    @FXML private HangmanModel model;
+    private HangmanModel model;
     private final WordRepository wordRepository = new WordRepository();
 
     private int winStreak = 0;
@@ -64,9 +65,10 @@ public class GameController {
 
     @FXML
     public void initialize() {
-        // --- Set Hangman.png as the Background Image ---
+        // Load background image safely
         setBackgroundImage();
 
+        // Setup difficulty dropdown
         difficultyComboBox.setItems(FXCollections.observableArrayList(Difficulty.values()));
         difficultyComboBox.setValue(Difficulty.MEDIUM);
         
@@ -79,39 +81,37 @@ public class GameController {
         prepareNewRound();
     }
 
+    /**
+     * Attempts to load the background image safely from resources with CSS fallback.
+     */
     private void setBackgroundImage() {
-    try {
-        var imageStream = getClass().getResourceAsStream("/Hangman.png");
-        
-        if (imageStream == null) {
-            System.err.println("Could not find /Hangman.png in resources folder!");
-            return;
+        try {
+            var imageStream = getClass().getResourceAsStream("/Hangman.png");
+            if (imageStream == null) {
+                imageStream = getClass().getResourceAsStream("/pictures/background.png");
+            }
+
+            if (imageStream != null && rootPane != null) {
+                Image bgImage = new Image(imageStream);
+
+                BackgroundSize backgroundSize = new BackgroundSize(
+                    100, 100, true, true, false, true
+                );
+
+                BackgroundImage backgroundImage = new BackgroundImage(
+                    bgImage,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    backgroundSize
+                );
+
+                rootPane.setBackground(new Background(backgroundImage));
+            }
+        } catch (Exception e) {
+            System.err.println("Could not load background image: " + e.getMessage());
         }
-
-        if (rootPane != null) {
-            Image bgImage = new Image(imageStream);
-
-            // Configure background to behave like CSS 'cover' (fill pane, keep ratio)
-            BackgroundSize backgroundSize = new BackgroundSize(
-                100, 100, true, true, false, true
-            );
-
-            BackgroundImage backgroundImage = new BackgroundImage(
-                bgImage,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                backgroundSize
-            );
-
-            rootPane.setBackground(new Background(backgroundImage));
-        } else {
-            System.err.println("rootPane is null! Make sure fx:id=\"rootPane\" is assigned in Scene Builder.");
-        }
-    } catch (Exception e) {
-        System.err.println("Error setting background image: " + e.getMessage());
     }
-}
 
     @FXML
     public void onStartClicked() {
@@ -166,6 +166,7 @@ public class GameController {
             roundTimer.pause();
         }
 
+        resultLabel.setText("");
         resultLabel.setOpacity(0);
         restartButton.setVisible(false);
         startButton.setVisible(true);
@@ -183,24 +184,24 @@ public class GameController {
         categoryLabel.setText("Category: " + model.getCurrentWord().category());
         wordLabel.setText(model.getHiddenWord());
 
-        // Hearts Display
+        // Render Hearts (Active vs Lost)
         livesBox.getChildren().clear();
         int activeLives = model.getRemainingLives();
 
         for (int i = 0; i < activeLives; i++) {
             Label heart = new Label("\u2665");
-            heart.setStyle("-fx-text-fill: #ff3333; -fx-font-size: 24px;");
+            heart.setStyle("-fx-text-fill: #91001b; -fx-font-size: 22px;");
             livesBox.getChildren().add(heart);
         }
 
         int lostLives = model.getCurrentWrongs();
         for (int i = 0; i < lostLives; i++) {
             Label heart = new Label("\u2665");
-            heart.setStyle("-fx-text-fill: #45475a; -fx-font-size: 24px;");
+            heart.setStyle("-fx-text-fill: #3a384d; -fx-font-size: 22px;");
             livesBox.getChildren().add(heart);
         }
 
-        // Hangman Stage Image overlay calculation
+        // Hangman Stage Image Resolution
         try {
             int imageIndex;
             if (model.isLose()) {
@@ -244,7 +245,7 @@ public class GameController {
             if (score > highScore) highScore = score;
 
             resultLabel.setText("Victory ! +" + roundScore + " pts");
-            resultLabel.setStyle("-fx-text-fill: #a6e3a1;");
+            resultLabel.setStyle("-fx-text-fill: #b0e8b6;");
             restartButton.setText("Next Round ▶");
 
             isContinuingTimer = true;
@@ -266,7 +267,8 @@ public class GameController {
 
         for (char c = 'A'; c <= 'Z'; c++) {
             Button letterButton = new Button(String.valueOf(c));
-            letterButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            letterButton.getStyleClass().add("keyboard-button");
+
             letterButton.setOnAction(event -> handleKeyboardInput(letterButton.getText()));
 
             int index = c - 'A';
@@ -278,17 +280,35 @@ public class GameController {
     }
 
     public void handleKeyboardInput(String character) {
-        if (model.isWin() || model.isLose()) return;
+        if (model.isWin() || model.isLose() || keyboardGrid.isDisabled()) return;
 
         if (character != null && character.length() == 1) {
             char letter = Character.toUpperCase(character.charAt(0));
 
             if ('A' <= letter && letter <= 'Z') {
+                boolean correct = model.getWordToGuess()
+                        .toUpperCase()
+                        .contains(String.valueOf(letter));
+
                 disableButtonForLetter(letter);
                 model.tryLetter(letter);
+
+                if (!correct) {
+                    shakeKeyboard();
+                }
+
                 refreshUI();
             }
         }
+    }
+
+    private void shakeKeyboard() {
+        TranslateTransition shake = new TranslateTransition(Duration.millis(50), keyboardGrid);
+        shake.setFromX(0);
+        shake.setByX(12);
+        shake.setCycleCount(6);
+        shake.setAutoReverse(true);
+        shake.play();
     }
 
     private void disableButtonForLetter(char letter) {
@@ -298,9 +318,11 @@ public class GameController {
             if (node instanceof Button btn && btn.getText().equalsIgnoreCase(String.valueOf(letter))) {
                 btn.setDisable(true);
                 if (isCorrect) {
-                    btn.setStyle("-fx-background-color: #a6e3a1; -fx-text-fill: #1e1e2e; -fx-opacity: 1.0;");
+                    // Soft Pastel Green
+                    btn.setStyle("-fx-background-color: #b0e8b6 !important; -fx-text-fill: #1e1e2e !important; -fx-opacity: 1.0 !important;");
                 } else {
-                    btn.setStyle("-fx-background-color: #f38ba8; -fx-text-fill: #1e1e2e; -fx-opacity: 0.4;");
+                    // Dimmed Soft Magenta / Red
+                    btn.setStyle("-fx-background-color: rgba(120, 60, 80, 0.45) !important; -fx-text-fill: rgba(255, 255, 255, 0.3) !important; -fx-opacity: 0.6 !important;");
                 }
                 break;
             }

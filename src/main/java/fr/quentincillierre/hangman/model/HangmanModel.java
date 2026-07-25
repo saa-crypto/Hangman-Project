@@ -11,13 +11,27 @@ public class HangmanModel {
     private int wrongGuesses = 0;
     private int hintsUsed = 0;
 
+    // Standard constructor (Fresh game / Game Over restart)
     public HangmanModel(Word word) {
+        this(word, 0, 0);
+    }
+
+    // Constructor overload to carry over health across winning rounds
+    public HangmanModel(Word word, int wrongGuesses, int hintsUsed) {
         this.currentWord = word;
         this.difficulty = word.difficulty();
+        this.wrongGuesses = wrongGuesses;
+        this.hintsUsed = hintsUsed;
     }
 
     public boolean tryLetter(char letter) {
         letter = Character.toUpperCase(letter);
+
+        // FIX BUG 1: Ignore input if letter was already guessed
+        if (guessedLetters.contains(letter)) {
+            return currentWord.text().toUpperCase().contains(String.valueOf(letter));
+        }
+
         guessedLetters.add(letter);
 
         if (!currentWord.text().toUpperCase().contains(String.valueOf(letter))) {
@@ -73,11 +87,11 @@ public class HangmanModel {
     public Word getCurrentWord() { return currentWord; }
     public Difficulty getDifficulty() { return difficulty; }
     public int getWrongGuesses() { return wrongGuesses; }
+    public int getHintsUsed() { return hintsUsed; }
     public int getCurrentWrongs() { return wrongGuesses + hintsUsed; }
     public int getMaxWrongs() { return difficulty.getMaxLives(); }
     public String getWordToGuess() { return currentWord.text(); }
 
-    // Added getter method for guessed letters
     public Set<Character> getGuessedLetters() {
         return guessedLetters;
     }
