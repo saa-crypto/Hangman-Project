@@ -1,9 +1,9 @@
 package fr.quentincillierre.hangman.model;
 
 public enum Difficulty {
-    EASY(10, "Easy", 100),
-    MEDIUM(8, "Medium", 200),
-    HARD(6, "Hard", 300);
+    EASY(10, "Easy", 1),
+    MEDIUM(8, "Medium", 2),
+    HARD(6, "Hard", 3);
 
     private final int maxLives;
     private final String displayName;
