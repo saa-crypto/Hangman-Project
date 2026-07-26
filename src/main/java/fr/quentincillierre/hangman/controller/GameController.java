@@ -1,7 +1,7 @@
 package fr.quentincillierre.hangman.controller;
-
 import fr.quentincillierre.hangman.model.Difficulty;
 import fr.quentincillierre.hangman.model.HangmanModel;
+import fr.quentincillierre.hangman.model.Word;
 import fr.quentincillierre.hangman.model.WordRepository;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -155,7 +155,18 @@ public class GameController {
 
     private void prepareNewRound() {
         Difficulty selectedDiff = difficultyComboBox.getValue();
-        this.model = new HangmanModel(wordRepository.getRandomWord(selectedDiff));
+Word newWord = wordRepository.getRandomWord(selectedDiff);
+
+if (model != null && model.isWin()) {
+    // Continue with the same remaining lives
+    this.model = new HangmanModel(
+            newWord,
+            model.getWrongGuesses(),
+            model.getHintsUsed());
+} else {
+    // New game after losing or first launch
+    this.model = new HangmanModel(newWord);
+}
 
         if (!isContinuingTimer || secondsRemaining <= 0) {
             secondsRemaining = 60;
