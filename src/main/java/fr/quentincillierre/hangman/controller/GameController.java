@@ -1,5 +1,8 @@
 package fr.quentincillierre.hangman.controller;
+import java.io.IOException;
+
 import fr.quentincillierre.hangman.model.Difficulty;
+import fr.quentincillierre.hangman.model.GameStats;
 import fr.quentincillierre.hangman.model.HangmanModel;
 import fr.quentincillierre.hangman.model.Word;
 import fr.quentincillierre.hangman.model.WordRepository;
@@ -8,8 +11,11 @@ import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -24,6 +30,7 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class GameController {
@@ -49,10 +56,12 @@ public class GameController {
     @FXML private Button startButton;
     @FXML private Button hintButton;
     @FXML private Button restartButton;
+    @FXML private Button backButton;
 
     // --- Game Logic & Persistence ---
     private HangmanModel model;
     private final WordRepository wordRepository = new WordRepository();
+    private final GameStats gameStats = GameStats.getInstance();
 
     private int winStreak = 0;
     private int score = 0;
@@ -62,6 +71,16 @@ public class GameController {
     private Timeline roundTimer;
     private int secondsRemaining = 60;
     private boolean isContinuingTimer = false;
+
+    /**
+     * Sets the difficulty before the game starts.
+     * Called from MenuController when the player selects a difficulty and starts the game.
+     */
+    public void setDifficulty(Difficulty difficulty) {
+        if (difficultyComboBox != null) {
+            difficultyComboBox.setValue(difficulty);
+        }
+    }
 
     @FXML
     public void initialize() {
@@ -77,6 +96,12 @@ public class GameController {
             prepareNewRound();
         });
 
+        // Load high score from stats
+        highScore = gameStats.getHighScore();
+
+        // Setup back button
+        backButton.setOnAction(event -> handleBackToMenu());
+
         setupTimer();
         prepareNewRound();
     }
@@ -86,9 +111,9 @@ public class GameController {
      */
     private void setBackgroundImage() {
         try {
-            var imageStream = getClass().getResourceAsStream("/Hangman.png");
+            var imageStream = getClass().getResourceAsStream("/pictures/hangman.png");
             if (imageStream == null) {
-                imageStream = getClass().getResourceAsStream("/pictures/background.png");
+                imageStream = getClass().getResourceAsStream("/hangman.png");
             }
 
             if (imageStream != null && rootPane != null) {
@@ -255,6 +280,9 @@ if (model != null && model.isWin()) {
             score += roundScore;
             if (score > highScore) highScore = score;
 
+            // Track win in stats
+            gameStats.recordGameResult(true, score);
+
             resultLabel.setText("Victory ! +" + roundScore + " pts");
             resultLabel.setStyle("-fx-text-fill: #b0e8b6;");
             restartButton.setText("Next Round ▶");
@@ -262,6 +290,10 @@ if (model != null && model.isWin()) {
             isContinuingTimer = true;
         } else {
             winStreak = 0;
+            
+            // Track loss in stats
+            gameStats.recordGameResult(false, score);
+            
             resultLabel.setText("Game Over !");
             resultLabel.setStyle("-fx-text-fill: #f38ba8;");
             restartButton.setText("Play Again");
@@ -274,20 +306,36 @@ if (model != null && model.isWin()) {
     }
 
     private void generateKeyboard() {
-        keyboardGrid.getChildren().clear();
+    keyboardGrid.getChildren().clear();
+    keyboardGrid.setHgap(8);
+    keyboardGrid.setVgap(8);
+    keyboardGrid.setAlignment(Pos.CENTER);
+    keyboardGrid.setStyle("-fx-padding: 10 20 10 20;");
 
-        for (char c = 'A'; c <= 'Z'; c++) {
+    String[] rows = {
+        "QWERTYUIOP",
+        "ASDFGHJKL",
+        "ZXCVBNM"
+    };
+
+    for (int row = 0; row < rows.length; row++) {
+        String letters = rows[row];
+
+        for (int col = 0; col < letters.length(); col++) {
+            char c = letters.charAt(col);
+
             Button letterButton = new Button(String.valueOf(c));
             letterButton.getStyleClass().add("keyboard-button");
+            letterButton.setFocusTraversable(false);
+            letterButton.setPrefSize(44, 44);
+            letterButton.setMinSize(44, 44);
+            letterButton.setMaxSize(44, 44);
 
             letterButton.setOnAction(event -> handleKeyboardInput(letterButton.getText()));
 
-            int index = c - 'A';
-            int col = index % 13;
-            int row = index / 13;
-
-            keyboardGrid.add(letterButton, col, row);
+            keyboardGrid.add(letterButton, col + row, row);
         }
+    }
     }
 
     public void handleKeyboardInput(String character) {
@@ -356,5 +404,28 @@ if (model != null && model.isWin()) {
             }
         }));
         roundTimer.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void handleBackToMenu() {
+        try {
+            // Load the menu view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/quentincillierre/hangman/application/menu-view.fxml"));
+            Parent menuView = loader.load();
+
+            Scene scene = new Scene(menuView, 1000, 700);
+            String css = getClass().getResource("/fr/quentincillierre/hangman/application/style.css").toExternalForm();
+            scene.getStylesheets().add(css);
+
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to go back to menu");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 }

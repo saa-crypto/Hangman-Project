@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox fx:id="settingsPane" alignment="CENTER" prefHeight="600" prefWidth="800" spacing="20" styleClass="settings-root-pane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.quentincillierre.hangman.controller.SettingsController">
+
+    <!-- Title -->
+    <Label styleClass="settings-title" text="⚙️ SETTINGS" />
+
+    <!-- Settings Options -->
+    <VBox alignment="CENTER" spacing="20" styleClass="settings-card">
+        
+        <!-- Sound Setting -->
+        <HBox alignment="CENTER" spacing="15">
+            <Label styleClass="settings-label" text="🔊 Sound Effects:" minWidth="200" />
+            <CheckBox fx:id="soundCheckBox" styleClass="settings-checkbox" />
+        </HBox>
+
+        <!-- Animations Setting -->
+        <HBox alignment="CENTER" spacing="15">
+            <Label styleClass="settings-label" text="✨ Animations:" minWidth="200" />
+            <CheckBox fx:id="animationsCheckBox" styleClass="settings-checkbox" />
+        </HBox>
+
+        <!-- Difficulty Modifier -->
+        <HBox alignment="CENTER" spacing="15">
+            <Label styleClass="settings-label" text="🎯 Time Limit:" minWidth="200" />
+            <Slider fx:id="difficultySlider" prefWidth="250" min="10" max="120" />
+        </HBox>
+    </VBox>
+
+    <!-- Back Button -->
+    <Button fx:id="backButton" prefWidth="150" prefHeight="45" styleClass="secondary-button" text="◀ BACK" />
+
+</VBox>

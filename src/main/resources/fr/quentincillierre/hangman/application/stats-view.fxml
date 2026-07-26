@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox fx:id="statsPane" alignment="CENTER" prefHeight="600" prefWidth="800" spacing="20" styleClass="stats-root-pane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.quentincillierre.hangman.controller.StatsController">
+
+    <!-- Title -->
+    <Label styleClass="stats-title" text="📊 GAME STATISTICS" />
+
+    <!-- Stats Display -->
+    <VBox alignment="CENTER" spacing="15" styleClass="stats-card">
+        <Label fx:id="highScoreLabel" styleClass="stats-label" text="🏆 High Score: 0" />
+        <Label fx:id="totalGamesLabel" styleClass="stats-label" text="🎮 Total Games: 0" />
+        <Label fx:id="winsLabel" styleClass="stats-label" text="✅ Wins: 0 | ❌ Losses: 0" />
+        <Label fx:id="winRateLabel" styleClass="stats-label" text="📊 Win Rate: 0%" />
+        <Label fx:id="currentStreakLabel" styleClass="stats-label" text="🔥 Current Streak: 0" />
+        <Label fx:id="bestStreakLabel" styleClass="stats-label" text="⭐ Best Streak: 0" />
+    </VBox>
+
+    <!-- Buttons -->
+    <HBox alignment="CENTER" spacing="15">
+        <Button fx:id="resetButton" prefWidth="150" prefHeight="45" styleClass="danger-button" text="🔄 RESET" />
+        <Button fx:id="backButton" prefWidth="150" prefHeight="45" styleClass="secondary-button" text="◀ BACK" />
+    </HBox>
+
+</VBox>
