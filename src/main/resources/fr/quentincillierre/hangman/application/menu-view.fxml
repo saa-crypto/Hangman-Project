@@ -29,7 +29,6 @@
             <Button fx:id="playButton" prefWidth="220" prefHeight="50" styleClass="play-button" text="▶ PLAY" />
             <Button fx:id="rulesButton" prefWidth="220" prefHeight="50" styleClass="menu-button" text="📖 RULES" />
             <Button fx:id="statsButton" prefWidth="220" prefHeight="50" styleClass="menu-button" text="📊 STATS" />
-            <Button fx:id="settingsButton" prefWidth="220" prefHeight="50" styleClass="menu-button" text="⚙️ SETTINGS" />
             <Button fx:id="exitButton" prefWidth="220" prefHeight="50" styleClass="exit-button" text="❌ EXIT" />
         </VBox>
         

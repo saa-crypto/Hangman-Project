@@ -22,7 +22,6 @@ public class MenuController {
     @FXML private Button playButton;
     @FXML private Button rulesButton;
     @FXML private Button statsButton;
-    @FXML private Button settingsButton;
     @FXML private Button exitButton;
 
     @FXML
@@ -35,7 +34,6 @@ public class MenuController {
         playButton.setOnAction(event -> handlePlayGame());
         rulesButton.setOnAction(event -> handleRules());
         statsButton.setOnAction(event -> handleStats());
-        settingsButton.setOnAction(event -> handleSettings());
         exitButton.setOnAction(event -> handleExit());
     }
 
@@ -118,27 +116,6 @@ public class MenuController {
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to load statistics", e.getMessage());
-        }
-    }
-
-    private void handleSettings() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/quentincillierre/hangman/application/settings-view.fxml"));
-            Parent settingsView = loader.load();
-
-            Scene scene = new Scene(settingsView);
-            String css = getClass().getResource("/fr/quentincillierre/hangman/application/style.css").toExternalForm();
-            scene.getStylesheets().add(css);
-
-            Stage stage = new Stage();
-            stage.setTitle("Settings");
-            stage.setScene(scene);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(settingsButton.getScene().getWindow());
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to load settings", e.getMessage());
         }
     }
 

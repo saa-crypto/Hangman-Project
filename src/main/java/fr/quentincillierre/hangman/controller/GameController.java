@@ -46,6 +46,7 @@ public class GameController {
 
     // --- Core Game UI ---
     @FXML private Label categoryLabel;
+    @FXML private Label hintLabel;
     @FXML private Label wordLabel;
     @FXML private Label resultLabel;
     @FXML private HBox livesBox;
@@ -53,10 +54,9 @@ public class GameController {
     @FXML private GridPane keyboardGrid;
 
     // --- Action Buttons ---
-    @FXML private Button startButton;
+    @FXML private Button backButton;
     @FXML private Button hintButton;
     @FXML private Button restartButton;
-    @FXML private Button backButton;
 
     // --- Game Logic & Persistence ---
     private HangmanModel model;
@@ -66,6 +66,7 @@ public class GameController {
     private int winStreak = 0;
     private int score = 0;
     private int highScore = 0;
+    private int lastRoundScore = 0;
 
     // --- Round Timer ---
     private Timeline roundTimer;
@@ -140,7 +141,6 @@ public class GameController {
 
     @FXML
     public void onStartClicked() {
-        startButton.setVisible(false);
         keyboardGrid.setDisable(false);
         
         if (model.getRemainingLives() > 1) {
@@ -165,13 +165,6 @@ public class GameController {
 
         if (revealedLetter != null) {
             disableButtonForLetter(revealedLetter);
-            
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Hint Used!");
-            alert.setHeaderText("Category: " + model.getCurrentWord().category());
-            alert.setContentText("Clue: " + model.getCurrentWord().hint());
-            alert.show();
-
             refreshUI();
         } else {
             hintButton.setDisable(true);
@@ -205,12 +198,14 @@ if (model != null && model.isWin()) {
         resultLabel.setText("");
         resultLabel.setOpacity(0);
         restartButton.setVisible(false);
-        startButton.setVisible(true);
         keyboardGrid.setDisable(true);
         hintButton.setDisable(true);
 
         generateKeyboard();
         refreshUI();
+        
+        // Auto-start the game
+        onStartClicked();
     }
 
     private void refreshUI() {
@@ -218,6 +213,7 @@ if (model != null && model.isWin()) {
         scoreLabel.setText("🏆 Score: " + score + " (High: " + highScore + ")");
 
         categoryLabel.setText("Category: " + model.getCurrentWord().category());
+        hintLabel.setText("💡 " + model.getCurrentWord().hint());
         wordLabel.setText(model.getHiddenWord());
 
         // Render Hearts (Active vs Lost)
@@ -268,7 +264,6 @@ if (model != null && model.isWin()) {
 
         keyboardGrid.setDisable(true);
         hintButton.setDisable(true);
-        startButton.setVisible(false);
         wordLabel.setText(model.getWordToGuess());
         resultLabel.setOpacity(1);
         resultLabel.setAlignment(Pos.CENTER);
@@ -276,7 +271,16 @@ if (model != null && model.isWin()) {
 
         if (model.isWin()) {
             winStreak++;
-            int roundScore = model.getDifficulty().getBasePoints() + (secondsRemaining * 5);
+            int roundScore;
+            
+            // Calculate points: base points doubled for each win in streak
+            if (winStreak == 1) {
+                roundScore = model.getDifficulty().getBasePoints();
+            } else {
+                roundScore = lastRoundScore * 2;
+            }
+            
+            lastRoundScore = roundScore;
             score += roundScore;
             if (score > highScore) highScore = score;
 
@@ -290,6 +294,7 @@ if (model != null && model.isWin()) {
             isContinuingTimer = true;
         } else {
             winStreak = 0;
+            lastRoundScore = 0; // Reset streak multiplier on loss
             
             // Track loss in stats
             gameStats.recordGameResult(false, score);
@@ -317,15 +322,26 @@ if (model != null && model.isWin()) {
         "ASDFGHJKL",
         "ZXCVBNM"
     };
+    
+    // Right-side water letters
+    String waterLetters = "YUIHBJKNM";
 
     for (int row = 0; row < rows.length; row++) {
         String letters = rows[row];
+        int startCol = (10 - letters.length()) / 2; // Center each row
 
         for (int col = 0; col < letters.length(); col++) {
             char c = letters.charAt(col);
 
             Button letterButton = new Button(String.valueOf(c));
-            letterButton.getStyleClass().add("keyboard-button");
+            
+            // Apply water style if letter is in right-side set
+            if (waterLetters.contains(String.valueOf(c))) {
+                letterButton.getStyleClass().add("keyboard-button-water");
+            } else {
+                letterButton.getStyleClass().add("keyboard-button");
+            }
+            
             letterButton.setFocusTraversable(false);
             letterButton.setPrefSize(44, 44);
             letterButton.setMinSize(44, 44);
@@ -333,7 +349,7 @@ if (model != null && model.isWin()) {
 
             letterButton.setOnAction(event -> handleKeyboardInput(letterButton.getText()));
 
-            keyboardGrid.add(letterButton, col + row, row);
+            keyboardGrid.add(letterButton, startCol + col, row);
         }
     }
     }

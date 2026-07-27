@@ -43,21 +43,49 @@
 }
 
 /* ==========================================
+   HANGMAN IMAGE CONTAINER
+   ========================================== */
+.hangman-container {
+    -fx-background-color: rgba(26, 23, 40, 0.9);
+    -fx-background-radius: 15px;
+    -fx-border-color: #ff0000;
+    -fx-border-radius: 15px;
+    -fx-border-width: 2px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.6), 25, 0.5, 0, 0);
+}
+
+/* ==========================================
    CENTRAL GAME CARD
    ========================================== */
 .game-card {
     -fx-background-color: rgba(26, 23, 40, 0.80);
     -fx-background-radius: 16px;
-    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-color: #89b4fa;
     -fx-border-radius: 16px;
+    -fx-border-width: 2px;
     -fx-padding: 16px 28px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0.2, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(137, 180, 250, 0.6), 25, 0.5, 0, 0);
 }
 
 .category-label {
     -fx-text-fill: #cba6f7;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
+}
+
+.hint-display {
+    -fx-text-fill: #f9e2af;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(249, 226, 175, 0.15);
+    -fx-background-radius: 10px;
+    -fx-padding: 10px 16px;
+    -fx-border-color: #f9e2af;
+    -fx-border-radius: 10px;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(249, 226, 175, 0.4), 10, 0.4, 0, 2);
+    -fx-text-alignment: center;
 }
 
 .lives-container {
@@ -98,6 +126,22 @@
     -fx-background-color: #b4befe;
 }
 
+.back-btn {
+    -fx-background-color: #a6adbb;
+    -fx-text-fill: #11111b;
+}
+.back-btn:hover {
+    -fx-background-color: #c8cdd5;
+}
+
+.hint-action-btn {
+    -fx-background-color: #f9e2af;
+    -fx-text-fill: #1e1e2e;
+}
+.hint-action-btn:hover {
+    -fx-background-color: #fce5b2;
+}
+
 .hint-button {
     -fx-background-color: #f9e2af;
     -fx-text-fill: #1e1e2e;
@@ -119,35 +163,95 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.9), 8, 0, 0, 2);
 }
 
+.word-display-card {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-letter-spacing: 6px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.9), 8, 0, 0, 2);
+    -fx-text-alignment: center;
+}
+
 /* ==========================================
    KEYBOARD BUTTONS
    ========================================== */
 .keyboard-button {
-    -fx-background-color: rgba(45, 43, 62, 0.90);
-    -fx-text-fill: #eaeaf2;
+    -fx-background-color: rgba(139, 40, 40, 0.9);
+    -fx-text-fill: #ff6b35;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-color: #ff4500;
+    -fx-border-width: 1px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0.2, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(255, 69, 0, 0.7), 15, 0.5, 0, 0), dropshadow(gaussian, rgba(0, 150, 255, 0.8), 25, 0.7, 15, 0);
 }
 
 .keyboard-button:hover {
-    -fx-background-color: rgba(70, 68, 92, 0.98);
-    -fx-text-fill: white;
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
+    -fx-background-color: rgba(200, 50, 30, 0.98);
+    -fx-text-fill: #ffff00;
+    -fx-border-color: #ff6b35;
+    -fx-effect: dropshadow(gaussian, rgba(255, 107, 53, 1.0), 20, 0.7, 0, 0), dropshadow(gaussian, rgba(0, 200, 255, 1.0), 30, 0.9, 15, 0);
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
 }
 
 .keyboard-button:pressed {
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
+    -fx-background-color: rgba(255, 69, 0, 0.98);
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(255, 107, 53, 1.0), 25, 0.9, 0, 2), dropshadow(gaussian, rgba(0, 200, 255, 1.0), 35, 1.0, 15, 2);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
 }
 
 .keyboard-button:disabled {
-    -fx-opacity: 0.85;
+    -fx-background-color: rgba(60, 20, 20, 0.7);
+    -fx-text-fill: rgba(255, 107, 53, 0.4);
+    -fx-opacity: 0.6;
+    -fx-border-color: rgba(255, 69, 0, 0.3);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0.3, 0, 0);
+}
+
+/* ==========================================
+   WATER/DRIPPING KEYBOARD BUTTONS (Right Side)
+   ========================================== */
+.keyboard-button-water {
+    -fx-background-color: rgba(30, 80, 120, 0.9);
+    -fx-text-fill: #00d4ff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: #00a8d8;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.7), 15, 0.5, 0, 0);
+}
+
+.keyboard-button-water:hover {
+    -fx-background-color: rgba(50, 120, 160, 0.98);
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #00d4ff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 1.0), 20, 0.7, 0, 0);
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
+.keyboard-button-water:pressed {
+    -fx-background-color: rgba(0, 170, 220, 0.98);
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 1.0), 25, 0.9, 0, 2);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.keyboard-button-water:disabled {
+    -fx-background-color: rgba(20, 40, 60, 0.7);
+    -fx-text-fill: rgba(0, 212, 255, 0.4);
+    -fx-opacity: 0.6;
+    -fx-border-color: rgba(0, 170, 220, 0.3);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0.3, 0, 0);
 }
 
 /* ==========================================
