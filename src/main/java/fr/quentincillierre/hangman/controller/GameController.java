@@ -1,5 +1,7 @@
 package fr.quentincillierre.hangman.controller;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.quentincillierre.hangman.model.Difficulty;
 import fr.quentincillierre.hangman.model.GameStats;
@@ -13,7 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -27,9 +28,9 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -51,7 +52,9 @@ public class GameController {
     @FXML private Label resultLabel;
     @FXML private HBox livesBox;
     @FXML private ImageView hangmanImageView;
-    @FXML private GridPane keyboardGrid;
+    
+    @FXML private VBox keyboardBox;
+    private final Map<Character, Button> keyboardButtons = new HashMap<>();
 
     // --- Action Buttons ---
     @FXML private Button backButton;
@@ -141,7 +144,7 @@ public class GameController {
 
     @FXML
     public void onStartClicked() {
-        keyboardGrid.setDisable(false);
+        keyboardBox.setDisable(false);
         
         if (model.getRemainingLives() > 1) {
             hintButton.setDisable(false);
@@ -173,18 +176,18 @@ public class GameController {
 
     private void prepareNewRound() {
         Difficulty selectedDiff = difficultyComboBox.getValue();
-Word newWord = wordRepository.getRandomWord(selectedDiff);
+        Word newWord = wordRepository.getRandomWord(selectedDiff);
 
-if (model != null && model.isWin()) {
-    // Continue with the same remaining lives
-    this.model = new HangmanModel(
-            newWord,
-            model.getWrongGuesses(),
-            model.getHintsUsed());
-} else {
-    // New game after losing or first launch
-    this.model = new HangmanModel(newWord);
-}
+        if (model != null && model.isWin()) {
+            // Continue with the same remaining lives
+            this.model = new HangmanModel(
+                    newWord,
+                    model.getWrongGuesses(),
+                    model.getHintsUsed());
+        } else {
+            // New game after losing or first launch
+            this.model = new HangmanModel(newWord);
+        }
 
         if (!isContinuingTimer || secondsRemaining <= 0) {
             secondsRemaining = 60;
@@ -198,7 +201,7 @@ if (model != null && model.isWin()) {
         resultLabel.setText("");
         resultLabel.setOpacity(0);
         restartButton.setVisible(false);
-        keyboardGrid.setDisable(true);
+        keyboardBox.setDisable(true);
         hintButton.setDisable(true);
 
         generateKeyboard();
@@ -262,7 +265,7 @@ if (model != null && model.isWin()) {
             roundTimer.pause();
         }
 
-        keyboardGrid.setDisable(true);
+        keyboardBox.setDisable(true);
         hintButton.setDisable(true);
         wordLabel.setText(model.getWordToGuess());
         resultLabel.setOpacity(1);
@@ -311,51 +314,48 @@ if (model != null && model.isWin()) {
     }
 
     private void generateKeyboard() {
-    keyboardGrid.getChildren().clear();
-    keyboardGrid.setHgap(8);
-    keyboardGrid.setVgap(8);
-    keyboardGrid.setAlignment(Pos.CENTER);
-    keyboardGrid.setStyle("-fx-padding: 10 20 10 20;");
+        keyboardBox.getChildren().clear();
+        keyboardButtons.clear();
 
-    String[] rows = {
-        "QWERTYUIOP",
-        "ASDFGHJKL",
-        "ZXCVBNM"
-    };
-    
-    // Right-side water letters
-    String waterLetters = "YUIHBJKNMPOL";
+        String[] rows = {
+            "QWERTYUIOP",
+            "ASDFGHJKL",
+            "ZXCVBNM"
+        };
+        
+        // Right-side water letters
+        String waterLetters = "YUIHBJKNMPOL";
 
-    for (int row = 0; row < rows.length; row++) {
-        String letters = rows[row];
-        int startCol = (10 - letters.length()) / 2; // Center each row
+        for (String rowLetters : rows) {
+            HBox rowBox = new HBox(8); // 8px horizontal spacing between keys
+            rowBox.setAlignment(Pos.CENTER);
 
-        for (int col = 0; col < letters.length(); col++) {
-            char c = letters.charAt(col);
+            for (char c : rowLetters.toCharArray()) {
+                Button letterButton = new Button(String.valueOf(c));
+                
+                // Apply water style if letter is in right-side set
+                if (waterLetters.indexOf(c) >= 0) {
+                    letterButton.getStyleClass().add("keyboard-button-water");
+                } else {
+                    letterButton.getStyleClass().add("keyboard-button");
+                }
+                
+                letterButton.setFocusTraversable(false);
+                letterButton.setPrefSize(44, 44);
+                letterButton.setMinSize(44, 44);
+                letterButton.setMaxSize(44, 44);
 
-            Button letterButton = new Button(String.valueOf(c));
-            
-            // Apply water style if letter is in right-side set
-            if (waterLetters.contains(String.valueOf(c))) {
-                letterButton.getStyleClass().add("keyboard-button-water");
-            } else {
-                letterButton.getStyleClass().add("keyboard-button");
+                letterButton.setOnAction(event -> handleKeyboardInput(letterButton.getText()));
+
+                rowBox.getChildren().add(letterButton);
+                keyboardButtons.put(c, letterButton); // Cache the button
             }
-            
-            letterButton.setFocusTraversable(false);
-            letterButton.setPrefSize(44, 44);
-            letterButton.setMinSize(44, 44);
-            letterButton.setMaxSize(44, 44);
-
-            letterButton.setOnAction(event -> handleKeyboardInput(letterButton.getText()));
-
-            keyboardGrid.add(letterButton, startCol + col, row);
+            keyboardBox.getChildren().add(rowBox);
         }
-    }
     }
 
     public void handleKeyboardInput(String character) {
-        if (model.isWin() || model.isLose() || keyboardGrid.isDisabled()) return;
+        if (model.isWin() || model.isLose() || keyboardBox.isDisabled()) return;
 
         if (character != null && character.length() == 1) {
             char letter = Character.toUpperCase(character.charAt(0));
@@ -378,7 +378,7 @@ if (model != null && model.isWin()) {
     }
 
     private void shakeKeyboard() {
-        TranslateTransition shake = new TranslateTransition(Duration.millis(50), keyboardGrid);
+        TranslateTransition shake = new TranslateTransition(Duration.millis(50), keyboardBox);
         shake.setFromX(0);
         shake.setByX(12);
         shake.setCycleCount(6);
@@ -388,18 +388,16 @@ if (model != null && model.isWin()) {
 
     private void disableButtonForLetter(char letter) {
         boolean isCorrect = model.getWordToGuess().toUpperCase().contains(String.valueOf(letter));
-
-        for (Node node : keyboardGrid.getChildren()) {
-            if (node instanceof Button btn && btn.getText().equalsIgnoreCase(String.valueOf(letter))) {
-                btn.setDisable(true);
-                if (isCorrect) {
-                    // Soft Pastel Green
-                    btn.setStyle("-fx-background-color: #b0e8b6 !important; -fx-text-fill: #1e1e2e !important; -fx-opacity: 1.0 !important;");
-                } else {
-                    // Dimmed Soft Magenta / Red
-                    btn.setStyle("-fx-background-color: rgba(120, 60, 80, 0.45) !important; -fx-text-fill: rgba(255, 255, 255, 0.3) !important; -fx-opacity: 0.6 !important;");
-                }
-                break;
+        
+        Button btn = keyboardButtons.get(Character.toUpperCase(letter));
+        if (btn != null) {
+            btn.setDisable(true);
+            if (isCorrect) {
+                // Soft Pastel Green
+                btn.setStyle("-fx-background-color: #b0e8b6 !important; -fx-text-fill: #1e1e2e !important; -fx-opacity: 1.0 !important;");
+            } else {
+                // Dimmed Soft Magenta / Red
+                btn.setStyle("-fx-background-color: rgba(120, 60, 80, 0.45) !important; -fx-text-fill: rgba(255, 255, 255, 0.3) !important; -fx-opacity: 0.6 !important;");
             }
         }
     }

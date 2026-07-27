@@ -4,7 +4,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -50,7 +49,5 @@
     </HBox>
 
     <!-- 3. Keyboard -->
-    <VBox alignment="CENTER" spacing="10" VBox.vgrow="ALWAYS">
-        <GridPane fx:id="keyboardGrid" alignment="CENTER" hgap="6" vgap="6" />
-    </VBox>
+    <VBox fx:id="keyboardBox" alignment="CENTER" spacing="8" VBox.vgrow="ALWAYS" style="-fx-padding: 10 20 10 20;" />
 </VBox>
