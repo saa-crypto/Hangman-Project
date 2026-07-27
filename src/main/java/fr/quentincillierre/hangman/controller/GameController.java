@@ -324,7 +324,7 @@ if (model != null && model.isWin()) {
     };
     
     // Right-side water letters
-    String waterLetters = "YUIHBJKNM";
+    String waterLetters = "YUIHBJKNMPOL";
 
     for (int row = 0; row < rows.length; row++) {
         String letters = rows[row];
