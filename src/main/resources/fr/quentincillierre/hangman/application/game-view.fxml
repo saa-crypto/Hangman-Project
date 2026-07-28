@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -14,7 +15,7 @@
         <Label fx:id="streakLabel" styleClass="stat-label" text="🔥 Streak: 0" />
         <Label fx:id="scoreLabel" styleClass="stat-label" text="🏆 Score: 0" />
         <Label fx:id="timerLabel" styleClass="timer-label" text="⏱️ 60s" />
-        <ComboBox fx:id="difficultyComboBox" prefHeight="25.0" prefWidth="103.0" styleClass="difficulty-combo" />
+        <ComboBox fx:id="difficultyComboBox" prefHeight="25.0" prefWidth="0.0" styleClass="difficulty-combo" />
     </HBox>
 
     <!-- 2. Main Content Area (Hangman Left + Game Card Right) -->
@@ -36,9 +37,6 @@
             <!-- Win / Loss Result Message -->
             <Label fx:id="resultLabel" styleClass="result-label" />
 
-            <!-- Hidden Word Display -->
-            <Label fx:id="wordLabel" styleClass="word-display-card" text="_   _   _   _      _" />
-
             <!-- Control Buttons -->
             <HBox alignment="CENTER" spacing="12">
                 <Button fx:id="backButton" prefHeight="26.0" prefWidth="142.0" styleClass="action-btn, back-btn" text="◀ BACK" />
@@ -48,6 +46,11 @@
         </VBox>
     </HBox>
 
-    <!-- 3. Keyboard -->
-    <VBox fx:id="keyboardBox" alignment="CENTER" spacing="8" VBox.vgrow="ALWAYS" style="-fx-padding: 10 20 10 20;" />
+    <!-- 3. Hidden Word Display -->
+    <Label fx:id="wordLabel" styleClass="word-display" text="_   _   _   _      _" VBox.vgrow="NEVER" />
+
+    <!-- 4. Keyboard -->
+    <VBox alignment="CENTER" spacing="10" VBox.vgrow="ALWAYS">
+        <GridPane fx:id="keyboardGrid" alignment="CENTER" hgap="6" vgap="6" />
+    </VBox>
 </VBox>

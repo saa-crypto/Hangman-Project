@@ -2,7 +2,7 @@ package fr.quentincillierre.hangman.model;
 
 public enum Difficulty {
     EASY(10, "Easy", 5),
-    MEDIUM(8, "Medium", 10),
+    MEDIUM(8, "Moderate", 10),
     HARD(6, "Hard", 20);
 
     private final int maxLives;
